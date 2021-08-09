@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ post.author.username }} | TechBookTrade{% endblock %}
+{% block contents %}
+
+{% if user.is_authenticated %}
+{% if user in post.get_notations %}
+  <button class="btn btn-outline-success post-disnotate mb-2" id="post-notate-{{ post.id }}" data-id="{{ post.id }}">
+    <i class="fas fa-bell"></i> 通知ON
+  </button>
+{% else %}
+  <button class="btn btn-outline-secondary post-notate mb-2" id="post-notate-{{ post.id }}" data-id="{{ post.id }}">
+    <i class="fas fa-bell-slash"></i> 通知OFF
+  </button>
+{% endif %}
+{% endif %}
+
+<div class="card {% if post.traded %}border-success{% endif %} mb-5 text-left">
+  
+    <div class="card-body">
+      <div class="row">
+        <div class="col-1">
+          <a href="{% url 'accounts:detail' post.author.id %}"><img src="{% if post.author.thumbnail %}{{ post.author.thumbnail.url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" class="rounded-circle profile-post-photo"></a>
+        </div>
+        <div class="col-9 ml-3">
+          <a href="{% url 'accounts:detail' post.author.id %}" class="text-secondary">{{ post.author }}</a><br>
+          <small class="text-muted">{{ post.created_at | date:"n月j日 H時i分" }}</small>
+        </div>
+        {% if post.traded %}
+        <div class="col-1 mr-1">
+          <img src="{% static 'images/done.png' %}" alt="done">
+        </div>
+        {% endif %}
+      </div>
+      <hr>
+      <p class="card-text mt-2"><i class="fas fa-book"></i> {{ post.text }}</p>
+      <p class="card-text mt-2"><i class="fas fa-at"></i> {{ post.station }}</p>
+      <button class="btn btn-link p-0 {% if user in post.get_like %}disabled post-liked text-secondary{% else %}post-like text-success{% endif %}" id="post-like-{{ post.id }}" data-id="{{ post.id }}">
+          <i class="far fa-heart"></i> 欲しい！
+      </button>
+      <span class="badge badge-success" id="like-count-{{ post.id }}">{% if post.get_like %}{{ post.get_like | length }}{% endif %}</span>
+      {% if post.author.id == user.id %}
+      <form method="get" action="{% url 'timeline:traded' post.id %}" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-link text-success p-0 ml-3 {% if post.traded %}disabled{% endif %}" type="submit" onclick='return confirm("交換済みとして登録します。いいですか？");return false;'>
+          <i class="fas fa-check"></i> 交換した！
+        </button>
+      </form>
+      <form method="post" action="{% url 'timeline:delete' post.id %}" class="d-inline">
+        {% csrf_token %}
+        <button class="btn btn-link text-success p-0 ml-3" type="submit" onclick='return confirm("この投稿を削除します。いいですか？");return false;'>
+          <i class="fas fa-trash-alt"></i> 削除
+        </button>
+      </form>
+      {% endif %}
+    </div>
+    
+    <img class="card-img-bottom" src="{{ post.post_photo.url }}" alt="Card image cap">
+</div>
+
+
+<form method="post" action="" enctype="multipart/form-data">
+	{% csrf_token %}
+	<div class="form-group">
+		<textarea class="form-control" id="exampleFormControlTextarea1"  name="text" rows="2" placeholder="メッセージを追加"></textarea>
+	</div>
+	<button class="btn btn-success btn-block" type="submit">送信</button>
+</form>
+
+<div class="text-left mt-1">
+{% for comment in object_list %}
+{% if comment.post == post %}
+<div class="line__container">
+
+  {% if comment.user != user %}
+
+  <div class="line__left my-0">
+    <figure>
+      <a href="{% url 'accounts:detail' comment.user.id %}"><img src="{% if comment.user.thumbnail %}{{ comment.user.thumbnail.url }}{% else %}{% static 'images/no_photo.png' %}{% endif %}" class="rounded-circle profile-post-photo" style="width: 100%; height: auto;"></a>
+    </figure>
+    <div class="line__left-text">
+      <div class="col-10 pl-1 text-left">
+        <a href="{% url 'accounts:detail' comment.user.id %}" class="text-secondary">{{ comment.user }}</a>
+        <small class="text-muted ml-2">{{ comment.created_at | date:"n/j H:i" }}</small>
+      </div>
+      <div class="text">{{ comment.text | linebreaksbr }}</div>
+    </div>
+  </div>
+
+  {% else %}
+
+  <div class="line__right my-0">
+    <div class="text"> {{ comment.text | linebreaksbr }}</div>
+    <div class="col-10 pl-1 text-left">
+      <small class="date text-muted ml-2">{{ comment.created_at | date:"n/j H:i" }}</small>
+    </div>
+  </div>
+
+  {% endif %}
+
+</div>
+{% endif %}
+{% endfor %}
+</div>
+
+{% endblock %}

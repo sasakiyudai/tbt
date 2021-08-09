@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load bootstrap4 %}
+{% block title %}ログイン | TechBookTrade{% endblock %}
+{% block contents %}
+<div class="form-content">
+  <h1 class="mb-4">ログイン</h1>
+  <form method="post" action="{% url 'account_login' %}">
+    {% csrf_token %}
+    {% bootstrap_form form %}
+    <button class="btn btn-success btn-block" type="submit"><i class="fas fa-sign-in-alt"></i> ログイン</button>
+  </form>
+</div>
+{% endblock %}
