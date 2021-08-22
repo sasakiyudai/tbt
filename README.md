@@ -1,5 +1,6 @@
 # TechBookTrade
 #### Video Demo:  https://youtu.be/95bKhKYkquA
+#### Slide: https://docs.google.com/presentation/d/1o8bQyOG2wXzJE_1QbYB_FgXqqKFdU1MfugMxASP4iXk/edit#slide=id.g35f391192_00
 #### Description:
 
 #### Overview:
